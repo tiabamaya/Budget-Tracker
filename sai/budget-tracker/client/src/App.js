@@ -20,7 +20,6 @@ const App = () => {
   const handleTransactionUpdate = (updatedTransactions) => {
     setTransactions(updatedTransactions);
 
-    // Recalculate actuals from scratch
     const newExpensesData = expensesData.map(row => {
       const totalForCategory = updatedTransactions
         .filter(tx => tx.category === row.category)
@@ -32,43 +31,45 @@ const App = () => {
     setExpensesData(newExpensesData);
   };
 
-
   return (
-    <div>
-      <div className="main-container">
-        <h1 style={{ textAlign: "center" }}>Monthly Budget</h1>
+    <div className="main-container">
+      <h1 style={{ textAlign: "center" }}>Monthly Budget</h1>
 
-
-        <div className="d-flex justify-content-center align-items-center">
-          <IncomeTable onIncomeUpdate={setIncomeData} />
-          <BillsTable onBillsUpdate={setBillsData} />
-        </div>
-        <div className="d-flex justify-content-center align-items-center">
-          <ExpensesTable onExpensesUpdate={setExpensesData} />
-          <SavingsTable onSavingsUpdate={setSavingsData} />
-        </div>
-        <div className="d-flex justify-content-center align-items-center">
-          <TransactionTable
-            expensesData={expensesData}
-            onTransactionAdd={handleTransactionUpdate}
-            categories={expensesData.map(e => e.category)}
-          />
-          <DebtTable onDebtUpdate={setDebtData} />
+      <div className="layout-container">
+        {/* Left Side */}
+        <div className="left-side">
+          <div className="section">
+            <IncomeTable onIncomeUpdate={setIncomeData} />
+            <BillsTable onBillsUpdate={setBillsData} />
+            <DebtTable onDebtUpdate={setDebtData} />
+            <SavingsTable onSavingsUpdate={setSavingsData} />
+          </div>
         </div>
 
+        {/* Right Side */}
+        <div className="right-side">
+          {/* Summary stays at the top */}
+          <div className="summary-section">
+            <Summary
+              incomeData={incomeData}
+              billData={billsData}
+              expenseData={expensesData}
+              savingData={savingsData}
+              debtData={debtData}
+            />
+          </div>
+
+          {/* Expenses and Transactions go below the summary */}
+          <div className="section">
+            <TransactionTable
+              expensesData={expensesData}
+              onTransactionAdd={handleTransactionUpdate}
+              categories={expensesData.map(e => e.category)}
+            />
+          </div>
+        </div>
       </div>
-      <Summary
-        incomeData={incomeData}
-        billData={billsData}
-        expenseData={expensesData}
-        savingData={savingsData}
-        debtData={debtData}
-      />
-
-
     </div>
-
-
   );
 };
 

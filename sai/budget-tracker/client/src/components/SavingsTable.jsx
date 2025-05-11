@@ -21,7 +21,7 @@ const SavingsTable = ({ onSavingsUpdate }) => {
         return isNaN(num) ? "" : num.toLocaleString();
     };
 
-    const handleInputChange = (e, rowIndex, key, data, setData) => {
+    const handleInputChange = (e, rowIndex, key) => {
         const input = e.target.value.replace(/,/g, "");
         if (!isNaN(input)) {
             const updated = savingsRows.map((row, i) =>
@@ -33,9 +33,15 @@ const SavingsTable = ({ onSavingsUpdate }) => {
     };
 
     const addRow = () => {
-        const newRows = [...savingsRows, { source: "", expected: "", actual: "" }];
+        const newRows = [...savingsRows, { category: "", expected: "", actual: "" }];
         setSavingsRows(newRows);
         onSavingsUpdate(newRows);
+    };
+
+    const deleteRow = (index) => {
+        const updatedRows = savingsRows.filter((_, i) => i !== index);
+        setSavingsRows(updatedRows);
+        onSavingsUpdate(updatedRows);
     };
 
     const total = (type) =>
@@ -68,7 +74,7 @@ const SavingsTable = ({ onSavingsUpdate }) => {
                                         inputMode="numeric"
                                         className="budget-input"
                                         value={formatNumberWithCommas(row.expected || "")}
-                                        onChange={(e) => handleInputChange(e, index, "expected", savingsRows, setSavingsRows)}
+                                        onChange={(e) => handleInputChange(e, index, "expected")}
                                     />
                                 </td>
                                 <td>
@@ -77,9 +83,18 @@ const SavingsTable = ({ onSavingsUpdate }) => {
                                         inputMode="numeric"
                                         className="budget-input"
                                         value={formatNumberWithCommas(row.actual || "")}
-                                        onChange={(e) => handleInputChange(e, index, "actual", savingsRows, setSavingsRows)}
+                                        onChange={(e) => handleInputChange(e, index, "actual")}
                                     />
                                 </td>
+                                    {index > 0 && (
+                                        <button
+                                         className="add-row-btn"
+                                            onClick={() => deleteRow(index)}
+                                            style={{ backgroundColor: "#e57373", marginLeft: "10px" }} // Adds gap to the left of the button
+                                        >
+                                            Delete
+                                        </button>
+                                    )}
                             </tr>
                         ))}
                         <tr className="totals">

@@ -10,7 +10,7 @@ const IncomeTable = ({ onIncomeUpdate }) => {
         const updatedRows = [...incomeRows];
         updatedRows[index][field] = value;
         setIncomeRows(updatedRows);
-        onIncomeUpdate(updatedRows); // keep this
+        onIncomeUpdate(updatedRows);
     };
 
     const formatNumberWithCommas = (value) => {
@@ -25,14 +25,20 @@ const IncomeTable = ({ onIncomeUpdate }) => {
                 i === rowIndex ? { ...row, [key]: input } : row
             );
             setIncomeRows(updated);
-            onIncomeUpdate(updated); // ✅ added this to propagate changes
+            onIncomeUpdate(updated);
         }
     };
 
     const addRow = () => {
         const newRows = [...incomeRows, { source: "", date: "", expected: "", actual: "" }];
         setIncomeRows(newRows);
-        onIncomeUpdate(newRows); // ✅ ensure parent gets new row
+        onIncomeUpdate(newRows);
+    };
+
+    const deleteRow = (index) => {
+        const updatedRows = incomeRows.filter((_, i) => i !== index);
+        setIncomeRows(updatedRows);
+        onIncomeUpdate(updatedRows);
     };
 
     const total = (type) =>
@@ -44,12 +50,10 @@ const IncomeTable = ({ onIncomeUpdate }) => {
                 <h2>Income</h2>
                 <table className="budget-table">
                     <thead>
-                        <tr>
                             <th>Source</th>
                             <th>Date</th>
                             <th>Expected</th>
                             <th>Actual</th>
-                        </tr>
                     </thead>
                     <tbody>
                         {incomeRows.map((row, index) => (
@@ -85,6 +89,18 @@ const IncomeTable = ({ onIncomeUpdate }) => {
                                         onChange={(e) => handleInputChange(e, index, "actual")}
                                     />
                                 </td>
+                                
+                                    {index > 0 && (
+                                        <button
+                                         className="add-row-btn"
+                                            onClick={() => deleteRow(index)}
+                                            style={{ backgroundColor: "#e57373", marginLeft: "10px" }} // Adds gap to the left of the button
+                                >
+                                    Delete
+                                </button>
+
+                                    )}
+                              
                             </tr>
                         ))}
                         <tr className="totals">

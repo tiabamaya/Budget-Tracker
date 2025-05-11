@@ -20,7 +20,7 @@ const DebtTable = ({ onDebtUpdate }) => {
         return isNaN(num) ? "" : num.toLocaleString();
     };
 
-    const handleInputChange = (e, rowIndex, key, data, setData) => {
+    const handleInputChange = (e, rowIndex, key) => {
         const input = e.target.value.replace(/,/g, "");
         if (!isNaN(input)) {
             const updated = debtRows.map((row, i) =>
@@ -32,9 +32,15 @@ const DebtTable = ({ onDebtUpdate }) => {
     };
 
     const addRow = () => {
-        const newRows = [...debtRows, { source: "", expected: "", actual: "" }];
+        const newRows = [...debtRows, { category: "", expected: "", actual: "" }];
         setDebtRows(newRows);
         onDebtUpdate(newRows);
+    };
+
+    const deleteRow = (index) => {
+        const updatedRows = debtRows.filter((_, i) => i !== index);
+        setDebtRows(updatedRows);
+        onDebtUpdate(updatedRows);
     };
 
     const total = (type) =>
@@ -67,7 +73,7 @@ const DebtTable = ({ onDebtUpdate }) => {
                                         inputMode="numeric"
                                         className="budget-input"
                                         value={formatNumberWithCommas(row.expected || "")}
-                                        onChange={(e) => handleInputChange(e, index, "expected", debtRows, setDebtRows)}
+                                        onChange={(e) => handleInputChange(e, index, "expected")}
                                     />
                                 </td>
                                 <td>
@@ -76,9 +82,19 @@ const DebtTable = ({ onDebtUpdate }) => {
                                         inputMode="numeric"
                                         className="budget-input"
                                         value={formatNumberWithCommas(row.actual || "")}
-                                        onChange={(e) => handleInputChange(e, index, "actual", debtRows, setDebtRows)}
+                                        onChange={(e) => handleInputChange(e, index, "actual")}
                                     />
                                 </td>
+                                {/* Delete button for each row */}
+                                {index > 2 && (
+                                          <button
+                                         className="add-row-btn"
+                                            onClick={() => deleteRow(index)}
+                                            style={{ backgroundColor: "#e57373", marginLeft: "10px" }} // Adds gap to the left of the button
+                                        >
+                                            Delete
+                                        </button>
+                                )}
                             </tr>
                         ))}
                         <tr className="totals">

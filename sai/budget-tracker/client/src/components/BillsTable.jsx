@@ -6,7 +6,6 @@ const BillsTable = ({ onBillsUpdate }) => {
         { bill: "", dueDate: "", expected: "", actual: "" },
     ]);
 
-
     const handleChange = (index, field, value) => {
         const updated = [...billRows];
         updated[index][field] = value;
@@ -19,7 +18,7 @@ const BillsTable = ({ onBillsUpdate }) => {
         return isNaN(num) ? "" : num.toLocaleString();
     };
 
-    const handleInputChange = (e, rowIndex, key,) => {
+    const handleInputChange = (e, rowIndex, key) => {
         const input = e.target.value.replace(/,/g, "");
         if (!isNaN(input)) {
             const updated = billRows.map((row, i) =>
@@ -36,10 +35,14 @@ const BillsTable = ({ onBillsUpdate }) => {
         onBillsUpdate(newRows);
     };
 
+    const deleteRow = (index) => {
+        const updatedRows = billRows.filter((_, i) => i !== index);
+        setBillRows(updatedRows);
+        onBillsUpdate(updatedRows);
+    };
+
     const total = (type) =>
         billRows.reduce((sum, row) => sum + parseFloat(row[type] || 0), 0);
-
-
 
     return (
         <div className="container">
@@ -76,7 +79,7 @@ const BillsTable = ({ onBillsUpdate }) => {
                                         inputMode="numeric"
                                         className="budget-input"
                                         value={formatNumberWithCommas(row.expected || "")}
-                                        onChange={(e) => handleInputChange(e, index, "expected", billRows, setBillRows)}
+                                        onChange={(e) => handleInputChange(e, index, "expected")}
                                     />
                                 </td>
                                 <td>
@@ -85,9 +88,19 @@ const BillsTable = ({ onBillsUpdate }) => {
                                         inputMode="numeric"
                                         className="budget-input"
                                         value={formatNumberWithCommas(row.actual || "")}
-                                        onChange={(e) => handleInputChange(e, index, "actual", billRows, setBillRows)}
+                                        onChange={(e) => handleInputChange(e, index, "actual")}
                                     />
                                 </td>
+                                {/* Delete button for each row */}
+                                     {index > 0 && (
+                                        <button
+                                         className="add-row-btn"
+                                            onClick={() => deleteRow(index)}
+                                            style={{ backgroundColor: "#e57373", marginLeft: "10px" }} // Adds gap to the left of the button
+                                        >
+                                            Delete
+                                        </button>
+                                )}
                             </tr>
                         ))}
                         <tr className="totals">

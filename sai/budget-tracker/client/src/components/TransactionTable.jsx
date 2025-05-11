@@ -65,6 +65,12 @@ const TransactionTable = ({ expensesData, onTransactionAdd, categories }) => {
         setTransactions(newRows);
     };
 
+    const deleteRow = (index) => {
+        const updatedRows = transactions.filter((_, i) => i !== index);
+        setTransactions(updatedRows);
+        onTransactionAdd(updatedRows);
+    };
+
     return (
         <div className="container">
             <div className="section">
@@ -116,6 +122,15 @@ const TransactionTable = ({ expensesData, onTransactionAdd, categories }) => {
                                         ))}
                                     </select>
                                 </td>
+                                    {index > 0 && (
+                                        <button
+                                         className="add-row-btn"
+                                            onClick={() => deleteRow(index)}
+                                            style={{ backgroundColor: "#e57373", marginLeft: "10px" }} // Adds gap to the left of the button
+                                        >
+                                            Delete
+                                        </button>
+                                    )}
                             </tr>
                         ))}
                     </tbody>

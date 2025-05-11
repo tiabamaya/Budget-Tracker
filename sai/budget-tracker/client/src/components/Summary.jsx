@@ -50,84 +50,95 @@ const Summary = ({ incomeData, billData, expenseData, savingData, debtData }) =>
         { name: "Debt", value: expected.debt },
     ];
 
-    return (
-        <div className="summary-section">
-            <div className="summary-status-box">
-                <div className="status-item">
-                    <p className="status-label">Amount Left to Budget</p>
-                    <p className="status-value">{currencyFormatter(budgetLeft)}</p>
-                </div>
-                <div className="status-item">
-                    <p className="status-label">Amount Left to Spend</p>
-                    <p className="status-value">{currencyFormatter(totals.income - (totals.bills + totals.expenses + totals.savings + totals.debt))}</p>
-                </div>
-            </div>
-            <h2>Budget Status</h2>
-            <div className="summary-totals">
-                <p>Income: {currencyFormatter(totals.income)}</p>
-                <p>Bills: {currencyFormatter(totals.bills)}</p>
-                <p>Expenses:{currencyFormatter(totals.expenses)}</p>
-                <p>Savings: {currencyFormatter(totals.savings)}</p>
-                <p>Debt: {currencyFormatter(totals.debt)}</p>
-                <p>Total Spent: {currencyFormatter(totals.bills + totals.expenses + totals.savings + totals.debt)}</p>
-            </div>
+return (
+    <div className="summary-section">
 
-            <div className="charts-container">
-                <div className="chart-box">
-                    <h3>Income (Expected vs. Actual)</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={incomeBarData}>
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip formatter={currencyFormatter} />
-                            <Legend />
-                            <Bar dataKey="Expected" fill="#F7C59F" />
-                            <Bar dataKey="Actual" fill="#C8D5B9" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
+        {/* Amount Left to Budget and Spend Section - Now Above Everything */}
+        <div className="summary-status-box">
+            <div className="status-item">
+                <p className="status-label">Amount Left to Budget</p>
+                <p className="status-value">{currencyFormatter(budgetLeft)}</p>
             </div>
-
-            <div className="charts-container">
-                <div className="chart-box">
-                    <h3>Spending (Expected vs Actual)</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={barData}>
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip formatter={currencyFormatter} />
-                            <Legend />
-                            <Bar dataKey="Expected" fill="#F49FB6" />
-                            <Bar dataKey="Actual" fill="#8EABC1" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-
-                <div className="chart-box">
-                    <h3>Spending Breakdown of Expected Budget</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                            <Pie
-                                data={pieData}
-                                dataKey="value"
-                                nameKey="name"
-                                cx="50%"
-                                cy="50%"
-                                outerRadius={90}
-                                label={renderCustomizedLabel}
-                                labelLine={false}
-                            >
-                                {pieData.map((_, i) => (
-                                    <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip formatter={currencyFormatter} />
-                        </PieChart>
-                    </ResponsiveContainer>
-                </div>
+            <div className="status-item">
+                <p className="status-label">Amount Left to Spend</p>
+                <p className="status-value">
+                    {currencyFormatter(
+                        totals.income - (totals.bills + totals.expenses + totals.savings + totals.debt)
+                    )}
+                </p>
             </div>
         </div>
-    );
+
+        {/* Chart Section */}
+        <div className="charts-row">
+            {/* Income Chart */}
+            <div className="chart-box">
+                <h3>Income (Expected vs. Actual)</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={incomeBarData}>
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip formatter={currencyFormatter} />
+                        <Legend />
+                        <Bar dataKey="Expected" fill="#F7C59F" />
+                        <Bar dataKey="Actual" fill="#C8D5B9" />
+                    </BarChart>
+                </ResponsiveContainer>
+            </div>
+
+            {/* Spending Chart */}
+            <div className="chart-box">
+                <h3>Spending (Expected vs Actual)</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={barData}>
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip formatter={currencyFormatter} />
+                        <Legend />
+                        <Bar dataKey="Expected" fill="#F49FB6" />
+                        <Bar dataKey="Actual" fill="#8EABC1" />
+                    </BarChart>
+                </ResponsiveContainer>
+            </div>
+
+            {/* Pie Chart */}
+            <div className="chart-box">
+                <h3>Spending Breakdown of Expected Budget</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                        <Pie
+                            data={pieData}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={90}
+                            label={renderCustomizedLabel}
+                            labelLine={false}
+                        >
+                            {pieData.map((_, i) => (
+                                <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
+                            ))}
+                        </Pie>
+                        <Tooltip formatter={currencyFormatter} />
+                    </PieChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+
+        {/* Budget Summary Below All Charts */}
+        <h3>Budget Status</h3>
+        <div className="summary-totals">
+            <p>Income: {currencyFormatter(totals.income)}</p>
+            <p>Bills: {currencyFormatter(totals.bills)}</p>
+            <p>Expenses: {currencyFormatter(totals.expenses)}</p>
+            <p>Savings: {currencyFormatter(totals.savings)}</p>
+            <p>Debt: {currencyFormatter(totals.debt)}</p>
+            <p>Total Spent: {currencyFormatter(totals.bills + totals.expenses + totals.savings + totals.debt)}</p>
+        </div>
+    </div>
+);
+
 };
 
 export default Summary;
