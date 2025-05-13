@@ -1,4 +1,3 @@
-// --- BACKEND: Updated backend with income route ---
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -14,7 +13,11 @@ mongoose
   .catch((err) => console.log(err));
 
 app.use("/api/expenses", require("./routes/expenses"));
-app.use("/api/incomes", require("./routes/incomes"));
+app.use("/api/incomes", require("./routes/Incomes"));
+app.use("/api/bills", require("./routes/bills"));
+app.use("/api/debts", require("./routes/debts"));
+app.use("/api/savings", require("./routes/savings"));
+app.use("/api/transactions", require("./routes/transactions"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
