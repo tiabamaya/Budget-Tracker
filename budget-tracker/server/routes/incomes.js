@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Income = require("../models/income");
+const Income = require("../models/Income");
 
 // GET all incomes
 router.get("/", async (req, res) => {
@@ -28,4 +28,3 @@ router.post("/", async (req, res) => {
 });
 
 module.exports = router;
-a
