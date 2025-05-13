@@ -66,6 +66,9 @@ const App = () => {
               onTransactionAdd={handleTransactionUpdate}
               categories={expensesData.map(e => e.category)}
             />
+                  <ExpensesTable onExpensesUpdate={setExpensesData} />
+
+
           </div>
         </div>
       </div>
