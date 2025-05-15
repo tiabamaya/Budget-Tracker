@@ -7,10 +7,19 @@ import SavingsTable from "./components/SavingsTable";
 import TransactionTable from "./components/TransactionTable";
 import DebtTable from "./components/DebtTable";
 import Summary from "./components/Summary";
+import AuthPage from './components/AuthPage';
 import "./styles/Budget.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App = () => {
+  const [user, setUser] = useState(null);
+  const [incomeData, setIncomeData] = useState([]);
+  const [billsData, setBillsData] = useState([]);
+  const [expensesData, setExpensesData] = useState([]);
+  const [savingsData, setSavingsData] = useState([]);
+  const [debtData, setDebtData] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
@@ -18,7 +27,18 @@ const App = () => {
 
   const [selectedMonth, setSelectedMonth] = useState("January");
 
+  // Load user once
   useEffect(() => {
+    const savedUser = localStorage.getItem("authUser");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+
+  useEffect(() => {
+    if (!user) return;
+
     axios.get(`http://localhost:5000/api/expenses?month=${selectedMonth}`)
       .then(res => setExpensesData(res.data))
       .catch(err => console.error(err));
@@ -26,15 +46,9 @@ const App = () => {
     axios.get(`http://localhost:5000/api/transactions?month=${selectedMonth}`)
       .then(res => setTransactions(res.data))
       .catch(err => console.error(err));
-  }, [selectedMonth]);
+  }, [selectedMonth, user]);
 
 
-  const [incomeData, setIncomeData] = useState([]);
-  const [billsData, setBillsData] = useState([]);
-  const [expensesData, setExpensesData] = useState([]);
-  const [savingsData, setSavingsData] = useState([]);
-  const [debtData, setDebtData] = useState([]);
-  const [transactions, setTransactions] = useState([]);
 
   // Generic updateMonthlyData function (normal function, not a hook)
   const updateMonthlyData = (section, data) => {
@@ -70,8 +84,34 @@ const App = () => {
     setExpensesData(updatedExpenses);
   };
 
+  <button onClick={() => { localStorage.removeItem("authUser"); window.location.reload(); }}>
+    Logout
+  </button>
+
+  if (!user) {
+    return <AuthPage setUser={setUser} />;
+  }
   return (
     <div className="main-container">
+      <div style={{ textAlign: "right", margin: "1rem" }}>
+        <button
+          onClick={() => {
+            localStorage.removeItem("authUser");
+            setUser(null);
+          }}
+          style={{
+            padding: "0.5rem 1rem",
+            backgroundColor: "#ef4444",
+            color: "white",
+            border: "none",
+            borderRadius: "0.5rem",
+            cursor: "pointer"
+          }}
+        >
+          Logout
+        </button>
+      </div>
+
       <h1 style={{ textAlign: "center" }}>Monthly Budget</h1>
 
       <div
