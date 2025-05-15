@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Debt = require("../models/Debt");
+const Debt = require("../models/debt");
 
 // GET all debts for selected month
 router.get("/", async (req, res) => {

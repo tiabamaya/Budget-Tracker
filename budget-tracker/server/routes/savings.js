@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Saving = require("../models/Saving")
+const Saving = require("../models/saving")
 
 // GET all savings for a specific month
 router.get("/", async (req, res) => {
