@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import axios from "axios";
 import IncomeTable from "./components/IncomeTable";
 import BillsTable from "./components/BillsTable";
-import ExpensesTable from "./components/ExpensesTable";
+import VariableExpensesTable from "./components/ExpensesTable";
 import SavingsTable from "./components/SavingsTable";
 import TransactionTable from "./components/TransactionTable";
 import DebtTable from "./components/DebtTable";
@@ -17,14 +18,17 @@ const App = () => {
 
   const [selectedMonth, setSelectedMonth] = useState("January");
 
-  const [monthlyBudgets, setMonthlyBudgets] = useState(() =>
-    months.reduce((acc, month) => {
-      acc[month] = { income: [], expenses: [], savings: [], debt: [], transactions: [] };
-      return acc;
-    }, {})
-  );
+  useEffect(() => {
+    axios.get(`http://localhost:5000/api/expenses?month=${selectedMonth}`)
+      .then(res => setExpensesData(res.data))
+      .catch(err => console.error(err));
 
-  // Individual state for current month data
+    axios.get(`http://localhost:5000/api/transactions?month=${selectedMonth}`)
+      .then(res => setTransactions(res.data))
+      .catch(err => console.error(err));
+  }, [selectedMonth]);
+
+
   const [incomeData, setIncomeData] = useState([]);
   const [billsData, setBillsData] = useState([]);
   const [expensesData, setExpensesData] = useState([]);
@@ -32,79 +36,67 @@ const App = () => {
   const [debtData, setDebtData] = useState([]);
   const [transactions, setTransactions] = useState([]);
 
-  // Load data when a month is selected
-  const handleMonthChange = (month) => {
-    setSelectedMonth(month);
-    
-    const monthData = monthlyBudgets[month];
-
-    setIncomeData(monthData.income || []);
-    setExpensesData(monthData.expenses || []);
-    setSavingsData(monthData.savings || []);
-    setDebtData(monthData.debt || []);
-    setTransactions(monthData.transactions || []);
-  };
-
+  // Generic updateMonthlyData function (normal function, not a hook)
   const updateMonthlyData = (section, data) => {
-    const updatedMonth = {
-      ...monthlyBudgets[selectedMonth],
-      [section]: data
-    };
-
-    setMonthlyBudgets((prev) => ({
-      ...prev,
-      [selectedMonth]: updatedMonth
-    }));
-
-    // Update local states
     if (section === "income") setIncomeData(data);
     if (section === "expenses") setExpensesData(data);
     if (section === "savings") setSavingsData(data);
     if (section === "debt") setDebtData(data);
+    if (section === "bills") setBillsData(data);
     if (section === "transactions") setTransactions(data);
   };
+
+  // useCallback to prevent re-render loops (correct usage at top level)
+  const handleIncomeUpdate = useCallback((data) => updateMonthlyData("income", data), []);
+  const handleBillsUpdate = useCallback((data) => updateMonthlyData("bills", data), []);
+  const handleExpensesUpdate = useCallback((data) => updateMonthlyData("expenses", data), []);
+  const handleSavingsUpdate = useCallback((data) => updateMonthlyData("savings", data), []);
+  const handleDebtUpdate = useCallback((data) => updateMonthlyData("debt", data), []);
 
   const handleTransactionUpdate = (updatedTransactions) => {
     setTransactions(updatedTransactions);
 
-    // Update actuals in expenses
     const updatedExpenses = expensesData.map((row) => {
+      if (!row) return row;
       const total = updatedTransactions
         .filter((tx) => tx.category === row.category)
-        .reduce((sum, tx) => sum + (parseFloat(tx.amount?.replace(/,/g, "")) || 0), 0);
-
+        .reduce((sum, tx) => {
+          const amt = typeof tx.amount === "string" ? tx.amount.replace(/,/g, "") : tx.amount || 0;
+          return sum + parseFloat(amt);
+        }, 0);
       return { ...row, actual: total.toString() };
     });
 
     setExpensesData(updatedExpenses);
-
-    setMonthlyBudgets((prev) => ({
-      ...prev,
-      [selectedMonth]: {
-        ...prev[selectedMonth],
-        transactions: updatedTransactions,
-        expenses: updatedExpenses
-      }
-    }));
   };
 
   return (
     <div className="main-container">
       <h1 style={{ textAlign: "center" }}>Monthly Budget</h1>
 
-      {/* Month Buttons */}
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '1rem' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '0.5rem',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+        }}
+      >
         {months.map((month) => (
           <button
             key={month}
-            onClick={() => handleMonthChange(month)}
+            type="button"
+            onClick={() => setSelectedMonth(month)}
+            className="month-btn"
             style={{
               padding: '0.5rem 1rem',
+              backgroundColor: '#d277b1',
+              color: 'white',
               border: '1px solid #ccc',
               borderRadius: '4px',
-              backgroundColor: selectedMonth === month ? '#007bff' : '#f8f9fa',
-              color: selectedMonth === month ? '#fff' : '#000',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              flex: '1',
+              textAlign: 'center',
             }}
           >
             {month}
@@ -113,22 +105,41 @@ const App = () => {
       </div>
 
       <div className="layout-container">
-        {/* Left Side */}
         <div className="left-side">
           <div className="section">
             <IncomeTable
-              onIncomeUpdate={(data) => updateMonthlyData("income", data)}
-              selectedMonth={selectedMonth}  // Pass selectedMonth as prop
+              selectedMonth={selectedMonth}
+              onIncomeUpdate={handleIncomeUpdate}
             />
-            <BillsTable onBillsUpdate={setBillsData} />
-            <DebtTable onDebtUpdate={(data) => updateMonthlyData("debt", data)} />
-            <SavingsTable onSavingsUpdate={(data) => updateMonthlyData("savings", data)} />
+
+            <BillsTable
+              selectedMonth={selectedMonth}
+              onBillsUpdate={handleBillsUpdate}
+            />
+
+            <DebtTable
+              selectedMonth={selectedMonth}
+              onDebtUpdate={handleDebtUpdate}
+            />
+
+            <SavingsTable
+              selectedMonth={selectedMonth}
+              onSavingsUpdate={handleSavingsUpdate}
+            />
+
+            <VariableExpensesTable
+              selectedMonth={selectedMonth}
+              variableExpenses={expensesData}
+              transactions={transactions}
+              onUpdate={(data) => updateMonthlyData("expenses", data)}
+            />
+
           </div>
         </div>
 
-        {/* Right Side */}
         <div className="right-side">
           <div className="summary-section">
+
             <Summary
               incomeData={incomeData}
               billData={billsData}
@@ -138,14 +149,15 @@ const App = () => {
             />
           </div>
 
-          <ExpensesTable onExpensesUpdate={(data) => updateMonthlyData("expenses", data)} />
-
           <div className="section">
             <TransactionTable
-              expensesData={expensesData}
-              onTransactionAdd={handleTransactionUpdate}
-              categories={expensesData.map(e => e.category)}
+              selectedMonth={selectedMonth}
+              transactions={transactions}
+              onTransactionUpdate={handleTransactionUpdate}
+              categories={expensesData.filter(e => e).map(e => e.category || "")}
             />
+
+
           </div>
         </div>
       </div>

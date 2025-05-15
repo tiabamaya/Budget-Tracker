@@ -21,7 +21,8 @@
     flex-wrap: wrap;
 }
 
-.left-side, .right-side {
+.left-side,
+.right-side {
     flex: 1 1 48%;
     box-sizing: border-box;
     min-width: 300px;
@@ -113,6 +114,9 @@
 .add-row-btn:hover {
     background: #a44d87;
 }
+
+
+
 
 /* Totals */
 .totals td {
@@ -210,3 +214,94 @@
     }
 }
 
+.income-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.add-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.budget-table th,
+.budget-table td {
+    text-align: center;
+    padding: 8px;
+}
+
+.action-buttons button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    margin: 0 5px;
+}
+
+.action-buttons button:hover {
+    transform: scale(1.2);
+    transition: 0.2s ease-in-out;
+}
+
+.budget-table.no-action-borders th.no-border,
+.budget-table.no-action-borders td.action-icons,
+.budget-table.no-action-borders tfoot td.no-border {
+    border: none;
+}
+
+.budget-table.no-action-borders td.action-icons {
+    width: 1%;
+    white-space: nowrap;
+    padding: 0 6px;
+    text-align: right;
+}
+
+.icon-button {
+    background: transparent;
+    border: none;
+    color: #888;
+    padding: 2px;
+    margin: 0 2px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.icon-button:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #333;
+}
+
+.icon-button.danger:hover {
+    background: rgba(255, 0, 0, 0.1);
+    color: red;
+}
+
+.income-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.add-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
